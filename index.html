@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>שאלון אנונימי – התארגנות עובדים</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card-bg: #ffffff;
+      --accent: #4f46e5;
+      --accent-soft: rgba(79, 70, 229, 0.08);
+      --border: #e0e4f0;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --shadow-soft: 0 14px 40px rgba(15, 23, 42, 0.08);
+      --transition: 160ms ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #e0e7ff 0, #f5f7fb 45%, #f9fafb 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 24px 12px;
+    }
+
+    .page-wrap {
+      width: 100%;
+      max-width: 880px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      padding: 28px 24px 32px;
+      border: 1px solid rgba(15, 23, 42, 0.03);
+    }
+
+    @media (min-width: 768px) {
+      .card {
+        padding: 32px 32px 40px;
+      }
+    }
+
+    .header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .disclaimer {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--text-muted);
+      background: #f3f4ff;
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+
+    .disclaimer strong {
+      color: var(--accent);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .section {
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      padding: 18px 14px 18px;
+      background: #fbfcff;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .section-tag {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #4f46e5;
+      white-space: nowrap;
+    }
+
+    .section-description {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      display: inline-block;
+    }
+
+    .field {
+      margin-bottom: 10px;
+    }
+
+    input[type="text"],
+    select,
+    textarea {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 9px 10px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      background: #ffffff;
+      transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+      resize: vertical;
+      min-height: 46px;
+    }
+
+    textarea {
+      min-height: 80px;
+    }
+
+    input[type="text"]:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.1);
+      background: #ffffff;
+    }
+
+    .helper-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .chips-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      background: #ffffff;
+      cursor: pointer;
+      transition: background var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+    }
+
+    .chip input {
+      accent-color: var(--accent);
+    }
+
+    .chip:hover {
+      background: #f5f5ff;
+      border-color: #c7ccff;
+      transform: translateY(-1px);
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
+    }
+
+    .scale-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .scale-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: background var(--transition), border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+    }
+
+    .scale-option input {
+      accent-color: var(--accent);
+    }
+
+    .scale-option:hover {
+      background: #f5f5ff;
+      border-color: #c7ccff;
+      transform: translateY(-1px);
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
+    }
+
+    .footer-note {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    button[type="submit"] {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--accent);
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 10px 30px rgba(79, 70, 229, 0.35);
+      transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+    }
+
+    button[type="submit"]:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 38px rgba(79, 70, 229, 0.45);
+      background: #4338ca;
+    }
+
+    .submit-icon {
+      font-size: 16px;
+    }
+
+    .small-legal {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="card">
+      <header class="header">
+        <div class="badge">
+          <span class="badge-dot"></span>
+          שאלון אנונימי
+        </div>
+        <h1>מה אתם מצפים מההתארגנות?</h1>
+        <p class="subtitle">
+          השאלון נועד להבין מה חשוב לכם כעובדים בבית החולים הווטרינרי, כדי שהתארגנות העובדים תשקף
+          באמת את הצרכים שלכם – ביום-יום, במשמרות, ביחסים עם ההנהלה ובתנאים.
+        </p>
+        <p class="disclaimer">
+          <strong>אנונימיות מלאה:</strong> לא נאספים שמות, מיילים או פרטים מזהים. המטרה היחידה היא להבין
+          מה כואב לכם ומה תרצו לשפר.
+        </p>
+      </header>
+
+      <!--
+        הערה טכנית:
+        כרגע ה־action ריק. אם תרצו לחבר ל־backend / שירות איסוף טפסים,
+        החליפו את ה־action ב־URL המתאים.
+      -->
+      <form action="" method="post" novalidate>
+        <!-- פרטים כלליים (ללא זיהוי אישי) -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">קצת עליך (בלי זיהוי אישי)</div>
+            <span class="section-tag">רקע</span>
+          </div>
+          <p class="section-description">
+            השאלות כאן נועדו רק להבין תמונה כללית – לא מי ענה, אלא מאיזה תפקיד / אזור עבודה.
+          </p>
+
+          <div class="field">
+            <label for="role">באיזה תחום עבודה את/ה בעיקר?</label>
+            <select id="role" name="role">
+              <option value="">בחר/י אפשרות…</option>
+              <option value="vet">וטרינר/ית</option>
+              <option value="assistant">אסיסטנט/ית</option>
+              <option value="reception">קבלה / אדמיניסטרציה</option>
+              <option value="management">צוות ניהולי ביניים (לדוגמה משמרת)</option>
+              <option value="other">אחר</option>
+            </select>
+            <div class="helper-text">אין צורך לפרט מעבר לזה – אנחנו לא מחפשים לזהות אף אחד.</div>
+          </div>
+
+          <div class="field">
+            <label for="seniority">כמה זמן את/ה עובד/ת במקום (בערך)?</label>
+            <input
+              type="text"
+              id="seniority"
+              name="seniority"
+              placeholder='לדוגמה: "פחות משנה", "2–3 שנים", "מעל 5 שנים"'
+            />
+          </div>
+        </section>
+
+        <!-- ציפיות כלליות מההתארגנות -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">מה את/ה מצפה שהתארגנות העובדים תביא?</div>
+            <span class="section-tag">תמונה כללית</span>
+          </div>
+          <p class="section-description">
+            נשמח להבין מה בעיניך המטרות המרכזיות של ההתארגנות. אפשר לבחור כמה נושאים.
+          </p>
+
+          <div class="field">
+            <label>מה הכי חשוב לך שהתארגנות העובדים תשפר?</label>
+            <div class="chips-group">
+              <label class="chip">
+                <input type="checkbox" name="goals[]" value="respect" />
+                יחס מכבד יותר מההנהלה
+              </label>
+              <label class="chip">
+                <input type="checkbox" name="goals[]" value="workload" />
+                עומס עבודה וסידור משמרות
+              </label>
+              <label class="chip">
+                <input type="checkbox" name="goals[]" value="salary" />
+                שכר ותנאים סוציאליים
+              </label>
+              <label class="chip">
+                <input type="checkbox" name="goals[]" value="job_security" />
+                ביטחון תעסוקתי / הגנה מפני פיטורים לא הוגנים
+              </label>
+              <label class="chip">
+                <input type="checkbox" name="goals[]" value="development" />
+                התפתחות מקצועית / קורסים / הדרכות
+              </label>
+              <label class="chip">
+                <input type="checkbox" name="goals[]" value="transparency" />
+                שקיפות בקבלת החלטות
+              </label>
+              <label class="chip">
+                <input type="checkbox" name="goals[]" value="wellbeing" />
+                רווחה, בריאות נפשית, אווירה במקום העבודה
+              </label>
+              <label class="chip">
+                <input type="checkbox" name="goals[]" value="other" />
+                אחר
+              </label>
+            </div>
+            <div class="helper-text">סמן/י את כל מה שמרגיש לך נכון.</div>
+          </div>
+
+          <div class="field">
+            <label for="goals_free">במילים שלך – למה לדעתך חשוב שיהיה ועד/התארגנות?</label>
+            <textarea
+              id="goals_free"
+              name="goals_free"
+              placeholder="כל מחשבה, תחושה או דוגמה מהשטח – זה המקום לכתוב..."
+            ></textarea>
+          </div>
+        </section>
+
+        <!-- יחס מההנהלה -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">יחס מההנהלה ותקשורת</div>
+            <span class="section-tag">יחסי עבודה</span>
+          </div>
+          <p class="section-description">
+            הרבה התארגנויות מתחילות ממקום של תחושת יחס לא הוגן או תקשורת בעייתית. חשוב לנו להבין איפה זה פוגש אותך.
+          </p>
+
+          <div class="field">
+            <label>עד כמה חשוב לך שההתארגנות תעסוק ביחס ובהתנהלות של ההנהלה?</label>
+            <div class="scale-row">
+              <!-- הערכים 1–5 הם דוגמה. אפשר לשנות טקסט לפי הצורך -->
+              <label class="scale-option">
+                <input type="radio" name="management_importance" value="1" />
+                1 – פחות חשוב
+              </label>
+              <label class="scale-option">
+                <input type="radio" name="management_importance" value="2" />
+                2
+              </label>
+              <label class="scale-option">
+                <input type="radio" name="management_importance" value="3" />
+                3 – חשוב במידה בינונית
+              </label>
+              <label class="scale-option">
+                <input type="radio" name="management_importance" value="4" />
+                4
+              </label>
+              <label class="scale-option">
+                <input type="radio" name="management_importance" value="5" />
+                5 – אחד הדברים הכי חשובים
+              </label>
+            </div>
+            <div class="helper-text">אם לא מתאים לך לדרג – אפשר פשוט לדלג ולהמשיך.</div>
+          </div>
+
+          <div class="field">
+            <label for="management_issues">אם יש דוגמאות ספציפיות ליחס בעייתי או תקשורת לקויה – אפשר לכתוב כאן (ללא שמות):</label>
+            <textarea
+              id="management_issues"
+              name="management_issues"
+              placeholder="לדוגמה: צורת דיבור, חוסר הקשבה, יחס במשמרות לחוצות, הערות פוגעניות וכו'..."
+            ></textarea>
+          </div>
+        </section>
+
+        <!-- עומס עבודה ומשמרות -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">עומס עבודה, משמרות ואיזון חיים-עבודה</div>
+            <span class="section-tag">עומסים</span>
+          </div>
+          <p class="section-description">
+            עומס, לילות, שבתות וחגים – זה אחד המקומות הכי רגישים במרפאות ובתי חולים וטרינריים.
+          </p>
+
+          <div class="field">
+            <label for="workload_pain">מה הכי כואב לך כיום בנושא עומס עבודה / משמרות?</label>
+            <textarea
+              id="workload_pain"
+              name="workload_pain"
+              placeholder="לדוגמה: יותר מדי משמרות לילה, חוסר הוגנות בחלוקה, קושי לסרב למשמרת, זמן מנוחה לא מספיק וכו'..."
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <label for="workload_ideas">איך היית רוצה שההתארגנות תוכל לעזור בנושא הזה?</label>
+            <textarea
+              id="workload_ideas"
+              name="workload_ideas"
+              placeholder="רעיונות לשיפור – גם אם הם קטנים או 'לא ריאליים' – הכול מעניין אותנו בשלב הזה."
+            ></textarea>
+          </div>
+        </section>
+
+        <!-- שכר ותנאים -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">שכר, תנאים סוציאליים וביטחון תעסוקתי</div>
+            <span class="section-tag">שכר ותנאים</span>
+          </div>
+          <p class="section-description">
+            כאן אפשר להתייחס גם לשכר, גם לתנאים נלווים (פנסיה, נסיעות, ביגוד, חופשות) וגם לתחושת הביטחון במקום.
+          </p>
+
+          <div class="field">
+            <label for="salary_feel">איך את/ה מרגיש/ה לגבי השכר והתנאים כיום (בכמה מילים)?</label>
+            <textarea
+              id="salary_feel"
+              name="salary_feel"
+              placeholder="לדוגמה: 'שכר לא תואם עומס', 'אין מספיק הכרה בוותק', 'תנאים סבירים אבל יש מה לשפר' וכו'..."
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <label for="salary_expectations">מה היית רוצה לראות כתוצאה מהתארגנות בנושא שכר/תנאים?</label>
+            <textarea
+              id="salary_expectations"
+              name="salary_expectations"
+              placeholder="לדוגמה: עדכון טבלאות שכר, תוספת עבור לילות/שבתות, בונוסים, ימי חופשה, החזרי לימודים וכו'..."
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <label for="job_security">
+              האם יש לך חשש מפיטורים לא הוגנים או מענישה עקיפה על הבעת דעה / ביקורת?
+            </label>
+            <textarea
+              id="job_security"
+              name="job_security"
+              placeholder="אם כן – אפשר לפרט איך זה מורגש ומה היית רוצה שיהיה שונה."
+            ></textarea>
+          </div>
+        </section>
+
+        <!-- רווחה, התפתחות מקצועית ונושאים פתוחים -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">רווחה, התפתחות מקצועית ונושאים נוספים</div>
+            <span class="section-tag">פתוח</span>
+          </div>
+          <p class="section-description">
+            מעבר לשכר ולעומס – יש גם מקום לאיכות חיים, התפתחות מקצועית ותחושת שותפות.
+          </p>
+
+          <div class="field">
+            <label for="wellbeing">מה יכול לשפר את איכות החיים שלך בעבודה ביום-יום?</label>
+            <textarea
+              id="wellbeing"
+              name="wellbeing"
+              placeholder="לדוגמה: יותר שיחות צוות, תמיכה רגשית במקרים קשים, מרחב לשתף, חדר מנוחה נורמלי, ציוד טוב יותר וכו'..."
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <label for="development">
+              איזה סוג של התפתחות מקצועית היית רוצה שההתארגנות תקדם (אם בכלל)?
+            </label>
+            <textarea
+              id="development"
+              name="development"
+              placeholder="קורסים, הדרכות, כנסים, מרחב ללמידה, ליווי מקצועי – מה חשוב לך?"
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <label for="anything_else">יש עוד משהו שנראה לך חשוב שנדע?</label>
+            <textarea
+              id="anything_else"
+              name="anything_else"
+              placeholder="כל דבר שלא נכנס לאף סעיף קודם – סיפורים, רעיונות, דוגמאות, פחדים, תקוות..."
+            ></textarea>
+          </div>
+        </section>
+
+        <!-- סיום -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">סיום</div>
+            <span class="section-tag">תודה 🙏</span>
+          </div>
+          <p class="section-description">
+            תודה שלקחת זמן למלא את השאלון. כל מילה כאן עוזרת לצייר תמונה אמיתית של מה שקורה בשטח
+            ומה חשוב לעובדים.
+          </p>
+
+          <div class="actions">
+            <button type="submit">
+              שליחת השאלון
+              <span class="submit-icon">➜</span>
+            </button>
+            <p class="small-legal">
+              אם יש פרט שמרגיש לך מזוהה מדי – אפשר להשאיר שדה ריק. המטרה היא שתרגיש/י בטוח/ה לכתוב
+              בכנות מלאה.
+            </p>
+          </div>
+        </section>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
