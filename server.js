@@ -1,0 +1,114 @@
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+const { randomUUID } = require('crypto');
+
+const questionsPath = path.join(__dirname, 'data', 'questions.json');
+const questions = JSON.parse(fs.readFileSync(questionsPath, 'utf8'));
+
+function readAnswers(answersPath) {
+  try {
+    const content = fs.readFileSync(answersPath, 'utf8');
+    return JSON.parse(content);
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveAnswers(answersPath, answers) {
+  const dir = path.dirname(answersPath);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  fs.writeFileSync(answersPath, JSON.stringify(answers, null, 2));
+}
+
+function sendJson(res, statusCode, payload) {
+  res.writeHead(statusCode, {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type'
+  });
+  res.end(JSON.stringify(payload));
+}
+
+function handleRequest({ req, res, answersPath }) {
+  const { method, url } = req;
+
+  if (method === 'OPTIONS') {
+    res.writeHead(204, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    });
+    return res.end();
+  }
+
+  if (url === '/api/questions' && method === 'GET') {
+    return sendJson(res, 200, { questions });
+  }
+
+  if (url === '/api/answers' && method === 'GET') {
+    const answers = readAnswers(answersPath);
+    return sendJson(res, 200, { answers });
+  }
+
+  if (url === '/api/answers' && method === 'POST') {
+    let body = '';
+
+    req.on('data', (chunk) => {
+      body += chunk;
+    });
+
+    req.on('end', () => {
+      let parsed;
+      try {
+        parsed = body ? JSON.parse(body) : {};
+      } catch (error) {
+        return sendJson(res, 400, { error: 'Invalid JSON body' });
+      }
+
+      if (!parsed || typeof parsed.answers !== 'object' || Array.isArray(parsed.answers)) {
+        return sendJson(res, 400, { error: 'Request body must include an "answers" object' });
+      }
+
+      const normalizedResponses = questions.map((question) => ({
+        questionId: question.id,
+        response: parsed.answers[question.id] ?? null
+      }));
+
+      const storedAnswers = readAnswers(answersPath);
+      const entry = {
+        id: randomUUID(),
+        submittedAt: new Date().toISOString(),
+        responses: normalizedResponses
+      };
+
+      storedAnswers.push(entry);
+      saveAnswers(answersPath, storedAnswers);
+
+      return sendJson(res, 201, { message: 'Answers saved', entry });
+    });
+
+    return;
+  }
+
+  return sendJson(res, 404, { error: 'Not found' });
+}
+
+function buildServer(options = {}) {
+  const answersPath = options.answersPath || process.env.ANSWERS_PATH || path.join(__dirname, 'data', 'answers.json');
+
+  return http.createServer((req, res) => handleRequest({ req, res, answersPath }));
+}
+
+if (require.main === module) {
+  const port = process.env.PORT || 3000;
+  const server = buildServer();
+  server.listen(port, () => {
+    console.log(`Server listening on http://localhost:${port}`);
+  });
+}
+
+module.exports = { buildServer };
