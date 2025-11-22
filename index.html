@@ -398,6 +398,62 @@
     .info-note .icon {
       font-size: 16px;
     }
+
+    @media (max-width: 640px) {
+      body {
+        font-size: 18px;
+        padding: 24px 12px 30px;
+      }
+
+      .card {
+        padding: 26px 18px 30px;
+      }
+
+      h1 {
+        font-size: clamp(26px, 7vw, 34px);
+        line-height: 1.25;
+      }
+
+      .subtitle {
+        font-size: 16px;
+        line-height: 1.85;
+      }
+
+      .section {
+        padding: 18px 14px 18px;
+      }
+
+      .section-title {
+        font-size: 17px;
+      }
+
+      .section-description,
+      label,
+      input[type="text"],
+      select,
+      textarea,
+      button[type="submit"],
+      .info-note,
+      .footer-note,
+      .small-legal {
+        font-size: 16px;
+      }
+
+      .chip,
+      .scale-option {
+        font-size: 13px;
+      }
+
+      .badge,
+      .helper-text,
+      .section-tag {
+        font-size: 13px;
+      }
+
+      button[type="submit"] {
+        padding: 13px 24px;
+      }
+    }
   </style>
 </head>
 <body>
