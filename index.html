@@ -454,6 +454,21 @@
         padding: 13px 24px;
       }
     }
+    .status-message {
+      margin-top: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent-strong);
+      display: none;
+    }
+
+    .status-message.error {
+      color: #b91c1c;
+    }
+
+    .status-message.visible {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -755,10 +770,83 @@
               <span class="icon">📥</span>
               <span>התשובות מגיעות אך ורק מכם דרך הטופס הזה, ונשמרות כנתונים אנונימיים לצורכי הסקת מסקנות.</span>
             </div>
+            <div class="status-message" role="status" aria-live="polite"></div>
           </div>
         </section>
       </form>
     </div>
   </div>
+
+  <script>
+    const form = document.querySelector('form');
+    const submitButton = form.querySelector('button[type="submit"]');
+    const statusMessage = document.querySelector('.status-message');
+
+    function setStatus(message, isError = false) {
+      statusMessage.textContent = message;
+      statusMessage.classList.toggle('error', isError);
+      statusMessage.classList.add('visible');
+    }
+
+    function clearStatus() {
+      statusMessage.textContent = '';
+      statusMessage.classList.remove('error', 'visible');
+    }
+
+    function formValue(name) {
+      const value = form.elements[name]?.value || '';
+      return value.trim() === '' ? null : value.trim();
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      clearStatus();
+
+      const formData = new FormData(form);
+
+      const answers = {
+        role: formValue('role'),
+        seniority: formValue('seniority'),
+        goals: formData.getAll('goals[]'),
+        goals_free: formValue('goals_free'),
+        management_importance: formValue('management_importance'),
+        management_issues: formValue('management_issues'),
+        workload_pain: formValue('workload_pain'),
+        workload_ideas: formValue('workload_ideas'),
+        salary_feel: formValue('salary_feel'),
+        salary_expectations: formValue('salary_expectations'),
+        job_security: formValue('job_security'),
+        wellbeing: formValue('wellbeing'),
+        development: formValue('development'),
+        anything_else: formValue('anything_else')
+      };
+
+      submitButton.disabled = true;
+      submitButton.textContent = 'שולח...';
+
+      try {
+        const response = await fetch('/api/answers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answers })
+        });
+
+        if (!response.ok) {
+          const errorPayload = await response.json().catch(() => ({}));
+          const errorMessage = errorPayload.error || 'שמירת התשובות נכשלה. נסו שוב.';
+          throw new Error(errorMessage);
+        }
+
+        await response.json();
+        form.reset();
+        setStatus('תודה! התשובות נשמרו בהצלחה.');
+      } catch (error) {
+        setStatus(error.message, true);
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'שליחת השאלון';
+      }
+    });
+  </script>
 </body>
 </html>
