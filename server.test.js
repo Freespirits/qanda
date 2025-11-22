@@ -93,3 +93,21 @@ test('POST /api/answers stores answers and GET retrieves them', async () => {
   assert.strictEqual(getPayload.answers.length, 1);
   assert.strictEqual(getPayload.answers[0].responses.length, 14);
 });
+
+test('POST /api/answers recovers when existing answers file is not an array', async () => {
+  fs.writeFileSync(answersPath, '{}');
+
+  const postResponse = await fetch(`${baseUrl}/api/answers`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ answers: { role: 'assistant' } })
+  });
+
+  assert.strictEqual(postResponse.status, 201);
+
+  const getResponse = await fetch(`${baseUrl}/api/answers`);
+  const payload = await getResponse.json();
+
+  assert.strictEqual(payload.answers.length, 1);
+  assert.strictEqual(payload.answers[0].responses[0].response, 'assistant');
+});

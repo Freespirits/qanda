@@ -9,7 +9,8 @@ const questions = JSON.parse(fs.readFileSync(questionsPath, 'utf8'));
 function readAnswers(answersPath) {
   try {
     const content = fs.readFileSync(answersPath, 'utf8');
-    return JSON.parse(content);
+    const parsed = JSON.parse(content);
+    return Array.isArray(parsed) ? parsed : [];
   } catch (error) {
     return [];
   }
