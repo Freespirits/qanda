@@ -79,26 +79,37 @@ function handleRequest({ req, res, answersPath }) {
         return sendJson(res, 400, { error: 'Invalid JSON body' });
       }
 
-      if (!parsed || typeof parsed.answers !== 'object' || Array.isArray(parsed.answers)) {
+      const answersPayload = parsed?.answers;
+
+      if (
+        !parsed ||
+        answersPayload === null ||
+        typeof answersPayload !== 'object' ||
+        Array.isArray(answersPayload)
+      ) {
         return sendJson(res, 400, { error: 'Request body must include an "answers" object' });
       }
 
-      const normalizedResponses = questions.map((question) => ({
-        questionId: question.id,
-        response: parsed.answers[question.id] ?? null
-      }));
+      try {
+        const normalizedResponses = questions.map((question) => ({
+          questionId: question.id,
+          response: answersPayload[question.id] ?? null
+        }));
 
-      const storedAnswers = readAnswers(answersPath);
-      const entry = {
-        id: randomUUID(),
-        submittedAt: new Date().toISOString(),
-        responses: normalizedResponses
-      };
+        const storedAnswers = readAnswers(answersPath);
+        const entry = {
+          id: randomUUID(),
+          submittedAt: new Date().toISOString(),
+          responses: normalizedResponses
+        };
 
-      storedAnswers.push(entry);
-      saveAnswers(answersPath, storedAnswers);
+        storedAnswers.push(entry);
+        saveAnswers(answersPath, storedAnswers);
 
-      return sendJson(res, 201, { message: 'Answers saved', entry });
+        return sendJson(res, 201, { message: 'Answers saved', entry });
+      } catch (error) {
+        return sendJson(res, 500, { error: 'Failed to save answers' });
+      }
     });
 
     return;
