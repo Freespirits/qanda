@@ -133,4 +133,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { buildServer };
+module.exports = { buildServer, handleRequest };
