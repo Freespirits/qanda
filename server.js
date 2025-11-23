@@ -2,6 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { randomUUID } = require('crypto');
+const os = require('os');
 
 const questionsPath = path.join(__dirname, 'data', 'questions.json');
 const questions = JSON.parse(fs.readFileSync(questionsPath, 'utf8'));
@@ -34,6 +35,41 @@ function sendJson(res, statusCode, payload) {
     'Access-Control-Allow-Headers': 'Content-Type'
   });
   res.end(JSON.stringify(payload));
+}
+
+function ensureWritableDirectory(dir) {
+  try {
+    fs.mkdirSync(dir, { recursive: true });
+    const probePath = path.join(dir, `.write-test-${randomUUID()}`);
+    fs.writeFileSync(probePath, '');
+    fs.rmSync(probePath);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function resolveAnswersPath(options = {}) {
+  const fallback = path.join(os.tmpdir(), 'qanda-answers.json');
+
+  const candidatePaths = [options.answersPath, process.env.ANSWERS_PATH];
+
+  if (options.useDefaultPath !== false) {
+    candidatePaths.push(path.join(__dirname, 'data', 'answers.json'));
+  }
+
+  const filteredCandidates = candidatePaths.filter(Boolean);
+
+  for (const candidate of filteredCandidates) {
+    const dir = path.dirname(candidate);
+    if (ensureWritableDirectory(dir)) {
+      return candidate;
+    }
+  }
+
+  const fallbackDir = path.dirname(fallback);
+  ensureWritableDirectory(fallbackDir);
+  return fallback;
 }
 
 function handleRequest({ req, res, answersPath }) {
@@ -120,7 +156,7 @@ function handleRequest({ req, res, answersPath }) {
 }
 
 function buildServer(options = {}) {
-  const answersPath = options.answersPath || process.env.ANSWERS_PATH || path.join(__dirname, 'data', 'answers.json');
+  const answersPath = resolveAnswersPath(options);
 
   return http.createServer((req, res) => handleRequest({ req, res, answersPath }));
 }
@@ -133,4 +169,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { buildServer, handleRequest };
+module.exports = { buildServer, handleRequest, resolveAnswersPath };
