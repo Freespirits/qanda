@@ -38,6 +38,7 @@ function sendJson(res, statusCode, payload) {
 
 function handleRequest({ req, res, answersPath }) {
   const { method, url } = req;
+  const { pathname } = new URL(url, `http://${req.headers.host}`);
 
   if (method === 'OPTIONS') {
     res.writeHead(204, {
@@ -48,23 +49,23 @@ function handleRequest({ req, res, answersPath }) {
     return res.end();
   }
 
-  if (url === '/api/questions' && method === 'GET') {
+  if ((pathname === '/api/questions' || pathname === '/api/questions/') && method === 'GET') {
     return sendJson(res, 200, { questions });
   }
 
-  if (url === '/api/answers' && method === 'GET') {
+  if ((pathname === '/api/answers' || pathname === '/api/answers/') && method === 'GET') {
     const answers = readAnswers(answersPath);
       return sendJson(res, 200, { answers });
   }
 
-  if ((url === '/' || url === '/index.html') && method === 'GET') {
+  if ((pathname === '/' || pathname === '/index.html') && method === 'GET') {
     res.writeHead(200, {
       'Content-Type': 'text/html; charset=utf-8'
     });
     return res.end(indexHtml);
   }
 
-  if (url === '/api/answers' && method === 'POST') {
+  if ((pathname === '/api/answers' || pathname === '/api/answers/') && method === 'POST') {
     let body = '';
 
     req.on('data', (chunk) => {

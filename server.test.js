@@ -152,3 +152,21 @@ test('POST /api/answers rejects null answers payload gracefully', async () => {
   const payload = await response.json();
   assert.ok(payload.error.includes('answers'));
 });
+
+test('API endpoints tolerate trailing slashes and query strings', async () => {
+  const answers = { role: 'assistant' };
+
+  const postResponse = await fetch(`${baseUrl}/api/answers/?cache_bust=1`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ answers })
+  });
+
+  assert.strictEqual(postResponse.status, 201);
+
+  const getResponse = await fetch(`${baseUrl}/api/answers/?ts=${Date.now()}`);
+  assert.strictEqual(getResponse.status, 200);
+  const payload = await getResponse.json();
+  assert.strictEqual(payload.answers.length, 1);
+  assert.strictEqual(payload.answers[0].responses[0].response, 'assistant');
+});
