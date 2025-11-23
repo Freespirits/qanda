@@ -140,3 +140,15 @@ test('POST /api/answers recovers when existing answers file is not an array', as
   assert.strictEqual(payload.answers.length, 1);
   assert.strictEqual(payload.answers[0].responses[0].response, 'assistant');
 });
+
+test('POST /api/answers rejects null answers payload gracefully', async () => {
+  const response = await fetch(`${baseUrl}/api/answers`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ answers: null })
+  });
+
+  assert.strictEqual(response.status, 400);
+  const payload = await response.json();
+  assert.ok(payload.error.includes('answers'));
+});
