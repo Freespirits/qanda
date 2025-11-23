@@ -1,7 +1,6 @@
-const path = require('path');
-const { handleRequest } = require('../server');
+const { handleRequest, resolveAnswersPath } = require('../server');
 
 module.exports = (req, res) => {
-  const answersPath = process.env.ANSWERS_PATH || path.join(__dirname, '..', 'data', 'answers.json');
+  const answersPath = resolveAnswersPath();
   return handleRequest({ req, res, answersPath });
 };

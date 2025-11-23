@@ -14,7 +14,7 @@ The server listens on port `3000` by default and exposes:
 - `POST /api/answers` – accept a JSON body with an `answers` object keyed by question id.
 - `GET /api/answers` – return all stored submissions.
 
-Answers are saved to `data/answers.json`. You can override the file location with the `ANSWERS_PATH` environment variable.
+Answers are saved to `data/answers.json`. You can override the file location with the `ANSWERS_PATH` environment variable, and the server will automatically fall back to a writable temp directory when the default path is read-only (e.g., on serverless hosts).
 
 ## Testing
 

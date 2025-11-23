@@ -3,7 +3,7 @@ const assert = require('assert');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { buildServer } = require('./server');
+const { buildServer, resolveAnswersPath } = require('./server');
 
 function createTempAnswersPath() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'answers-'));
@@ -45,6 +45,11 @@ test('GET /api/questions returns all questions', async () => {
   const questionIds = payload.questions.map((q) => q.id);
   assert.ok(questionIds.includes('role'));
   assert.ok(questionIds.includes('anything_else'));
+});
+
+test('resolveAnswersPath falls back to a writable temporary location when provided paths are unusable', () => {
+  const resolvedPath = resolveAnswersPath({ answersPath: '/proc/answers.json', useDefaultPath: false });
+  assert.ok(resolvedPath.startsWith(os.tmpdir()));
 });
 
 test('GET / serves the questionnaire HTML', async () => {
