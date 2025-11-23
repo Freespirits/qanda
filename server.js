@@ -5,6 +5,8 @@ const { randomUUID } = require('crypto');
 
 const questionsPath = path.join(__dirname, 'data', 'questions.json');
 const questions = JSON.parse(fs.readFileSync(questionsPath, 'utf8'));
+const indexPath = path.join(__dirname, 'index.html');
+const indexHtml = fs.readFileSync(indexPath, 'utf8');
 
 function readAnswers(answersPath) {
   try {
@@ -52,7 +54,14 @@ function handleRequest({ req, res, answersPath }) {
 
   if (url === '/api/answers' && method === 'GET') {
     const answers = readAnswers(answersPath);
-    return sendJson(res, 200, { answers });
+      return sendJson(res, 200, { answers });
+  }
+
+  if ((url === '/' || url === '/index.html') && method === 'GET') {
+    res.writeHead(200, {
+      'Content-Type': 'text/html; charset=utf-8'
+    });
+    return res.end(indexHtml);
   }
 
   if (url === '/api/answers' && method === 'POST') {

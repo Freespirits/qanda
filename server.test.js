@@ -47,6 +47,14 @@ test('GET /api/questions returns all questions', async () => {
   assert.ok(questionIds.includes('anything_else'));
 });
 
+test('GET / serves the questionnaire HTML', async () => {
+  const response = await fetch(`${baseUrl}/`);
+  assert.strictEqual(response.status, 200);
+  const html = await response.text();
+  assert.ok(html.includes('<form'));
+  assert.ok(html.includes('name="role"'));
+});
+
 test('POST /api/answers validates payload shape', async () => {
   const response = await fetch(`${baseUrl}/api/answers`, {
     method: 'POST',
@@ -92,6 +100,27 @@ test('POST /api/answers stores answers and GET retrieves them', async () => {
   const getPayload = await getResponse.json();
   assert.strictEqual(getPayload.answers.length, 1);
   assert.strictEqual(getPayload.answers[0].responses.length, 14);
+});
+
+test('POST /api/answers writes data to the JSON file', async () => {
+  const answers = { role: 'assistant' };
+
+  const postResponse = await fetch(`${baseUrl}/api/answers`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ answers })
+  });
+
+  assert.strictEqual(postResponse.status, 201);
+
+  const storedFile = fs.readFileSync(answersPath, 'utf8');
+  const storedAnswers = JSON.parse(storedFile);
+
+  assert.strictEqual(storedAnswers.length, 1);
+  const [entry] = storedAnswers;
+  assert.ok(entry.id);
+  const roleResponse = entry.responses.find((response) => response.questionId === 'role');
+  assert.strictEqual(roleResponse.response, 'assistant');
 });
 
 test('POST /api/answers recovers when existing answers file is not an array', async () => {
